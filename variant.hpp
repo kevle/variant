@@ -327,7 +327,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
       : index_(other.index())
     {
       auto visitor = binary_move_construct_visitor();
-      VARIANT_NAMESPACE::visit(visitor, *this, other);
+      ::VARIANT_NAMESPACE::visit(visitor, *this, other);
     }
 
   private:
@@ -351,7 +351,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
       : index_(other.index())
     {
       auto visitor = binary_copy_construct_visitor();
-      VARIANT_NAMESPACE::visit(visitor, *this, other);
+      ::VARIANT_NAMESPACE::visit(visitor, *this, other);
     }
 
   private:
@@ -380,7 +380,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
     variant(const T& other)
       : index_(VARIANT_DETAIL_NAMESPACE::find_type<T,Types...>::value)
     {
-      VARIANT_NAMESPACE::visit(unary_copy_construct_visitor<T>{other}, *this);
+      ::VARIANT_NAMESPACE::visit(unary_copy_construct_visitor<T>{other}, *this);
     }
 
   private:
@@ -410,7 +410,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
       : index_(VARIANT_DETAIL_NAMESPACE::find_type<T,Types...>::value)
     {
       auto visitor = unary_move_construct_visitor<T>{other};
-      VARIANT_NAMESPACE::visit(visitor, *this);
+      ::VARIANT_NAMESPACE::visit(visitor, *this);
     }
 
   private:
@@ -442,7 +442,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
     ~variant()
     {
       auto visitor = destruct_visitor();
-      VARIANT_NAMESPACE::visit(visitor, *this);
+      ::VARIANT_NAMESPACE::visit(visitor, *this);
     }
 
   private:
@@ -502,11 +502,11 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
     {
       if(index() == other.index())
       {
-        VARIANT_NAMESPACE::visit(copy_assign_visitor(), *this, other);
+        ::VARIANT_NAMESPACE::visit(copy_assign_visitor(), *this, other);
       }
       else
       {
-        VARIANT_NAMESPACE::visit(destroy_and_copy_construct_visitor(), *this, other);
+        ::VARIANT_NAMESPACE::visit(destroy_and_copy_construct_visitor(), *this, other);
         index_ = other.index();
       }
 
@@ -536,12 +536,12 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
       if(index() == other.index())
       {
         auto visitor = move_assign_visitor();
-        VARIANT_NAMESPACE::visit(visitor, *this, other);
+        ::VARIANT_NAMESPACE::visit(visitor, *this, other);
       }
       else
       {
         auto visitor = destroy_and_move_construct_visitor();
-        VARIANT_NAMESPACE::visit(visitor, *this, std::move(other));
+        ::VARIANT_NAMESPACE::visit(visitor, *this, std::move(other));
         index_ = other.index();
       }
 
@@ -576,7 +576,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
       if(index() == other.index())
       {
         auto visitor = swap_visitor();
-        VARIANT_NAMESPACE::visit(visitor, *this, other);
+        ::VARIANT_NAMESPACE::visit(visitor, *this, other);
       }
       else
       {
@@ -610,7 +610,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
     bool operator==(const variant& rhs) const
     {
       auto visitor = equals();
-      return index() == rhs.index() && VARIANT_NAMESPACE::visit(visitor, *this, rhs);
+      return index() == rhs.index() && ::VARIANT_NAMESPACE::visit(visitor, *this, rhs);
     }
 
     VARIANT_ANNOTATION
@@ -643,7 +643,7 @@ class variant : private VARIANT_DETAIL_NAMESPACE::variant_storage<Types...>
     {
       if(index() != rhs.index()) return index() < rhs.index();
 
-      return VARIANT_NAMESPACE::visit(less(), *this, rhs);
+      return ::VARIANT_NAMESPACE::visit(less(), *this, rhs);
     }
 
     VARIANT_ANNOTATION
@@ -694,7 +694,7 @@ template<typename... Types>
 std::ostream &operator<<(std::ostream& os, const variant<Types...>& v)
 {
   auto visitor = VARIANT_DETAIL_NAMESPACE::ostream_output_visitor(os);
-  return VARIANT_NAMESPACE::visit(visitor, v);
+  return ::VARIANT_NAMESPACE::visit(visitor, v);
 }
 
 
@@ -831,7 +831,7 @@ struct binary_visitor_binder
   Result operator()(T&& x)
   {
     auto unary_visitor = unary_visitor_binder<VisitorReference, Result, decltype(x)>(std::forward<VisitorReference>(visitor), std::forward<T>(x));
-    return VARIANT_NAMESPACE::visit(unary_visitor, std::forward<VariantReference>(y));
+    return ::VARIANT_NAMESPACE::visit(unary_visitor, std::forward<VariantReference>(y));
   }
 };
 
@@ -854,7 +854,7 @@ typename std::result_of<
 
   auto visitor_wrapper = VARIANT_DETAIL_NAMESPACE::binary_visitor_binder<Visitor&&,result_type,decltype(var2)>(std::forward<Visitor>(visitor), std::forward<Variant2>(var2));
 
-  return VARIANT_NAMESPACE::visit(visitor_wrapper, std::forward<Variant1>(var1));
+  return ::VARIANT_NAMESPACE::visit(visitor_wrapper, std::forward<Variant1>(var1));
 }
 
 
@@ -903,7 +903,7 @@ VARIANT_DETAIL_NAMESPACE::variant_alternative_reference_t<i, variant<Types...>&>
   >::type;
 
   auto visitor = VARIANT_DETAIL_NAMESPACE::get_visitor<type>();
-  return *VARIANT_NAMESPACE::visit(visitor, v);
+  return *::VARIANT_NAMESPACE::visit(visitor, v);
 }
 
 
@@ -922,7 +922,7 @@ VARIANT_DETAIL_NAMESPACE::variant_alternative_reference_t<i, variant<Types...>&&
   >::type;
 
   auto visitor = VARIANT_DETAIL_NAMESPACE::get_visitor<type>();
-  return std::move(*VARIANT_NAMESPACE::visit(visitor, v));
+  return std::move(*::VARIANT_NAMESPACE::visit(visitor, v));
 }
 
 
@@ -941,7 +941,7 @@ VARIANT_DETAIL_NAMESPACE::variant_alternative_reference_t<i, const variant<Types
   >::type;
 
   auto visitor = VARIANT_DETAIL_NAMESPACE::get_visitor<type>();
-  return *VARIANT_NAMESPACE::visit(visitor, v);
+  return *::VARIANT_NAMESPACE::visit(visitor, v);
 }
 
 
