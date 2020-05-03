@@ -708,26 +708,26 @@ struct apply_visitor_impl : apply_visitor_impl<VisitorReference,Result,Types...>
   typedef apply_visitor_impl<VisitorReference,Result,Types...> super_t;
 
   VARIANT_ANNOTATION
-  static Result do_it(VisitorReference visitor, void* ptr, size_t index)
+  static Result do_it(VisitorReference&& visitor, void* ptr, size_t index)
   {
     if(index == 0)
     {
       return visitor(*reinterpret_cast<T*>(ptr));
     }
 
-    return super_t::do_it(visitor, ptr, --index);
+    return super_t::do_it(std::forward<VisitorReference>(visitor), ptr, --index);
   }
 
 
   VARIANT_ANNOTATION
-  static Result do_it(VisitorReference visitor, const void* ptr, size_t index)
+  static Result do_it(VisitorReference&& visitor, const void* ptr, size_t index)
   {
     if(index == 0)
     {
       return visitor(*reinterpret_cast<const T*>(ptr));
     }
 
-    return super_t::do_it(visitor, ptr, --index);
+    return super_t::do_it(std::forward<VisitorReference>(visitor), ptr, --index);
   }
 };
 
